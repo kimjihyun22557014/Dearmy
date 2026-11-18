@@ -98,12 +98,17 @@ export function pileScene(parent, entries, openStory, highlightedId) {
   function initialize() {
     width = scene.clientWidth;
     height = scene.clientHeight;
-    const radius = Math.min(60, Math.max(26, width / (Math.min(8, bodies.length + 1) * 2.4)));
+    const lanes = Math.min(bodies.length, width < 600 ? 5 : 10);
+    const radius = Math.max(24, Math.min(128, width / ((lanes + 1) * 2.15), height * .27));
+    const inset = Math.max(radius * 1.28, width * .075);
     for (const body of bodies) {
-      body.radius = radius * (.84 + (body.index % 4) * .07);
-      body.x = width * (.19 + ((body.index * 67) % 101) / 101 * .62);
-      body.y = -body.radius - body.index * 44;
-      body.vx = (body.index % 3 - 1) * 1.2;
+      const laneIndex = body.index % lanes;
+      const lane = laneIndex % 2 ? lanes - 1 - Math.floor(laneIndex / 2) : Math.floor(laneIndex / 2);
+      const fraction = lanes > 1 ? lane / (lanes - 1) : .5;
+      body.radius = radius * (.82 + (body.index % 4) * .09);
+      body.x = inset + fraction * (width - 2 * inset);
+      body.y = -body.radius - body.index * Math.min(35, height * .07);
+      body.vx = (body.index % 3 - 1) * .8;
       body.vy = 0;
       body.spin = 0;
       body.rotation = (body.index % 5 - 2) * 8;
@@ -122,7 +127,7 @@ export function pileScene(parent, entries, openStory, highlightedId) {
   }
 
   function keepInside(body) {
-    const floor = height - body.radius - 10;
+    const floor = height - body.radius * 1.25 - 9;
     if (body.y > floor) {
       body.y = floor;
       body.vy = body.vy > 1.35 ? -body.vy * .38 : 0;

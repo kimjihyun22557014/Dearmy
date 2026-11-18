@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, toDataUrl } from './photo.js';
 import { loadEntries, saveEntry, shared, invalidConfig } from './store.js';
-import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js';
+import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=wide-pile';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
