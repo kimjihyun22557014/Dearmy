@@ -70,20 +70,26 @@ p, h1, h2, figure { margin: 0; }
   transition: transform .16s ease;
 }
 .upload-note {
+  --arrow-width: clamp(92px, 10vw, 148px);
   position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  top: calc(100% + 2px);
-  right: 22%;
-  padding: 2px 1px 4px;
-  font-size: clamp(.77rem, 1.2vw, .94rem);
-  font-weight: 300;
-  line-height: 1.25;
+  left: calc(50% + var(--arrow-width) - 17px);
+  top: 90%;
+  padding: 3px 2px 7px;
+  color: #762439;
+  font: 300 clamp(1.13rem, 1.65vw, 1.5rem)/1.15 "Gaegu", "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
   letter-spacing: 0;
   white-space: nowrap;
 }
-.upload-arrow { display: inline-block; font: 400 1.42em/1 Georgia, serif; transform: rotate(-10deg); }
+.upload-note::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  right: calc(100% - 12px);
+  width: var(--arrow-width);
+  height: 38px;
+  background: url("./assets/upload-arrow.png") center / 100% 100% no-repeat;
+  pointer-events: none;
+}
 .upload-cta:is(:hover, :focus-visible) .upload-note { text-decoration: underline; text-underline-offset: .25em; }
 .upload-cta:hover img { transform: translateY(-2px); }
 .upload-cta:active img { transform: translateY(1px); }
@@ -182,6 +188,17 @@ textarea { resize: vertical; margin-top: 9px; }
 @media (max-width: 900px) {
   .tabs { left: var(--edge); top: 64px; gap: 4px; }
   .intro { min-height: 168px; }
+}
+@media (max-width: 700px) {
+  .wordmark { margin-bottom: 41px; }
+  .upload-note {
+    --arrow-width: 54px;
+    left: auto;
+    right: -.45rem;
+    top: calc(100% + 12px);
+    padding: 0 2px 4px;
+  }
+  .upload-note::before { top: -17px; right: 0; height: 22px; }
 }
 @media (max-width: 580px) {
   .top { top: 17px; }
