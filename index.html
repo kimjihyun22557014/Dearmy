@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="자주 쓰거나 곁에 두는 물건과 그 이야기를 모으는 온라인 참여 아카이브.">
+  <title>Dear My (?) — 나의 애착 물건 아카이브</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='11' fill='%232640ce'/%3E%3Ctext x='32' y='48' text-anchor='middle' fill='white' font-family='serif' font-size='49'%3E%3F%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#pile">Dear My (?)</a>
+    <button id="add" class="primary" type="button">물건 올리기 <span aria-hidden="true">＋</span></button>
+  </header>
+  <main class="desk">
+    <div class="intro"><p>나의 애착 물건 아카이브</p><h1>Dear My <em>(?)</em></h1><p>자주 쓰거나 곁에 두는 물건과 그 이야기를 모아요.</p></div>
+    <nav class="tabs" aria-label="아카이브 보기">
+      <a href="#pile" data-view="pile">쏟아진 물건</a>
+      <a href="#archive" data-view="archive">전체 기록</a>
+      <a href="#words" data-view="words">문장 속 물건</a>
+      <a href="#bag" data-view="bag">가방 속 물건</a>
+    </nav>
+    <section class="window" aria-labelledby="view-title">
+      <div class="bar">
+        <h2 id="view-title">쏟아진 물건</h2>
+        <button id="view-action" type="button">다시 떨어뜨리기</button>
+      </div>
+      <div id="scene"></div>
+      <div class="window-foot"><p id="hint"></p><p id="count"></p></div>
+    </section>
+    <p id="notice" role="status" aria-live="polite"></p>
+  </main>
+  <dialog id="story" aria-labelledby="story-title">
+    <div class="bar"><span>물건의 이야기</span><button type="button" data-close aria-label="닫기">✕</button></div>
+    <div class="story-body">
+      <img id="story-image" alt="">
+      <div><p id="story-meta" class="meta"></p><h2 id="story-title"></h2><p id="story-text"></p></div>
+    </div>
+  </dialog>
+  <dialog id="upload" aria-labelledby="upload-title">
+    <div class="bar"><h2 id="upload-title">물건 올리기</h2><button type="button" data-close aria-label="닫기">✕</button></div>
+    <form id="upload-form">
+      <div class="upload-images">
+        <label for="photo">물건 사진
+          <span>물건 하나가 잘 보이는 사진을 올려주세요.</span>
+          <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" required>
+        </label>
+        <div class="previews" hidden>
+          <figure><img id="original" alt="배경 제거 전"><figcaption>원본</figcaption></figure>
+          <figure><img id="cutout" alt="배경 제거 결과" hidden><figcaption>배경 제거 후</figcaption></figure>
+        </div>
+        <p id="processing" role="status" aria-live="polite"></p>
+        <button id="retry-photo" type="button" hidden>배경 제거 다시 시도</button>
+      </div>
+      <div class="fields">
+        <label>물건의 이름<input name="name" required maxlength="60" placeholder="예. 무선 이어폰"></label>
+        <label>함께한 시간<input name="duration" required maxlength="40" placeholder="예. 2년"></label>
+      </div>
+      <label for="entry-text">물건의 이야기</label>
+      <p class="guide-intro">아래 질문 중 이야기가 떠오르는 것부터 써보세요. 한두 질문에 답하는 것만으로도 충분해요.</p>
+      <ol class="guide">
+        <li><strong>이 물건을 가장 자주 찾는 순간은 언제인가요?</strong><span>등굣길, 잠들기 전, 작업을 시작할 때처럼 최근에 이 물건을 꺼내거나 곁에 둔 장면을 적어보세요.</span></li>
+        <li><strong>이 물건 덕분에 그 순간이 어떻게 달라졌나요?</strong><span>지루했던 시간이 짧게 느껴지거나 긴장이 조금 풀리는 것처럼, 일상에서 느낀 작은 변화를 적어보세요.</span></li>
+      </ol>
+      <details class="extra-guide">
+        <summary>다른 질문 보기</summary>
+        <ul class="guide">
+          <li><strong>이 물건은 어떻게 내 곁에 오게 되었나요?</strong><span>직접 골랐거나 누군가에게 받았을 때처럼, 이 물건을 처음 손에 넣은 순간을 떠올려보세요.</span></li>
+          <li><strong>이 물건에서 유독 마음에 드는 부분은 무엇인가요?</strong><span>손에 착 감기는 손잡이, 오래 써서 살짝 닳은 모서리, 가방에 쏙 들어가는 크기처럼 자꾸 손이 가게 하는 부분이 있다면 적어주세요.</span></li>
+        </ul>
+      </details>
+      <textarea id="entry-text" name="story" required maxlength="1000" rows="4" placeholder="예. 등굣길에 지하철을 타면 매일 이 이어폰을 꺼내요."></textarea>
+      <div class="form-end"><p id="storage-note"></p><button id="publish" type="submit" class="primary" disabled>등록하기 <span aria-hidden="true">↗</span></button></div>
+      <p id="form-error" role="alert"></p>
+    </form>
+  </dialog>
+</body>
+</html>
