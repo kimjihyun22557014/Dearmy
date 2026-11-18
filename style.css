@@ -32,22 +32,25 @@ p, h1, h2, figure { margin: 0; }
 .intro { display: grid; justify-items: center; padding: clamp(20px, 4vw, 52px) 0 19px; text-align: center; }
 .intro h1 { font: 400 clamp(3.15rem, 8.7vw, 7.5rem)/.98 Arial, sans-serif; letter-spacing: -.085em; margin: 0 0 14px; }
 .intro em { font: inherit; }
-.intro p { font-size: .84rem; line-height: 1.6; }
+.intro p, .upload-cta { font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.45; }
 .upload-cta {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  margin-top: 9px;
+  gap: 1px;
+  margin-top: 6px;
   padding: 4px 10px 5px;
   border: 0;
   background: none;
-  color: #a51b27;
-  font-size: .83rem;
-  font-weight: 700;
-  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 300;
 }
-.upload-cta img { display: block; width: 54px; height: 54px; transition: transform .16s ease; }
+.upload-cta img {
+  display: block;
+  width: clamp(88px, 9vw, 108px);
+  height: auto;
+  transition: transform .16s ease;
+}
 .upload-cta:is(:hover, :focus-visible) span { text-decoration: underline; text-underline-offset: .25em; }
 .upload-cta:hover img { transform: translateY(-2px); }
 .upload-cta:active img { transform: translateY(1px); }
