@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { makeCutout, toDataUrl } from './photo.js';
+import { makeCutout, toDataUrl } from './photo.js?v=cutout-quality';
 import { loadEntries, saveEntry, shared, invalidConfig } from './store.js';
 import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=wide-pile';
 
@@ -118,43 +118,61 @@ function clearPhoto() {
   publish.disabled = true;
 }
 
-async function preparePhoto() {
-  clearPhoto();
+let cutoutMethod;
+
+async function preparePhoto({ retry = false } = {}) {
+  if (retry && (preparingPhoto || saving)) return;
+  if (!retry) {
+    clearPhoto();
+    cutoutMethod = undefined;
+  }
   const file = photo.files[0];
   if (!file) return;
-  const version = requestVersion;
+  const version = ++requestVersion;
   if (file.size > 15 * 1024 * 1024) {
     formError.textContent = '15MB 이하의 사진을 올려주세요.';
     return;
   }
 
   preparingPhoto = true;
-  originalUrl = URL.createObjectURL(file);
-  original.src = originalUrl;
-  original.closest('.previews').hidden = false;
+  retryPhoto.hidden = true;
+  publish.disabled = true;
+  if (!retry) {
+    originalUrl = URL.createObjectURL(file);
+    original.src = originalUrl;
+    original.closest('.previews').hidden = false;
+  }
   processing.textContent = '사진에서 물건을 찾는 중이에요.';
   try {
-    const { blob } = await makeCutout(file, message => {
+    const { blob, method } = await makeCutout(file, message => {
       if (requestVersion === version) processing.textContent = message;
-    });
+    }, { forceModel: retry, detailed: retry && cutoutMethod === 'model' });
     if (requestVersion !== version) return;
     selectedImage = blob;
+    cutoutMethod = method;
+    if (cutoutUrl) URL.revokeObjectURL(cutoutUrl);
     cutoutUrl = URL.createObjectURL(blob);
     cutout.src = cutoutUrl;
     cutout.hidden = false;
     processing.textContent = '배경 제거가 끝났어요. 윤곽을 확인해보세요.';
-    publish.disabled = invalidConfig;
+    retryPhoto.textContent = '배경 제거 다시 하기';
+    retryPhoto.hidden = method === 'transparent' || method === 'detailed';
   } catch (error) {
     if (requestVersion !== version) return;
     processing.textContent = error.message || '배경을 지우는 중에 문제가 생겼어요.';
+    if (selectedImage) processing.textContent += ' 이전 미리보기는 그대로 사용할 수 있어요.';
+    retryPhoto.textContent = '배경 제거 다시 시도';
     retryPhoto.hidden = false;
   } finally {
-    if (requestVersion === version) preparingPhoto = false;
+    if (requestVersion === version) {
+      preparingPhoto = false;
+      publish.disabled = !selectedImage || invalidConfig;
+    }
   }
 }
 
-photo.addEventListener('change', preparePhoto);
-retryPhoto.addEventListener('click', preparePhoto);
+photo.addEventListener('change', () => preparePhoto());
+retryPhoto.addEventListener('click', () => preparePhoto({ retry: true }));
 get('storage-note').textContent = invalidConfig
   ? '공동 아카이브 설정을 확인해주세요.'
   : (shared ? '사진과 이야기가 공개 아카이브에 올라가요.' : '시연 모드에서는 이 브라우저에만 기록이 저장돼요.');

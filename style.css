@@ -213,3 +213,5 @@ textarea { resize: vertical; margin-top: 9px; }
   .story-body img { height: 150px; }
   .bag-shell, .bag-front { inset-inline: 9%; }
 }
+
+#retry-photo { text-decoration: underline; text-underline-offset: .22em; }

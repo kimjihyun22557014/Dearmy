@@ -50,7 +50,7 @@ function removeFlatBackground(pixels) {
     const offset = index * 4;
     return Math.hypot(data[offset] - background[0], data[offset + 1] - background[1], data[offset + 2] - background[2]);
   }
-  if (border.filter(index => distance(index) < 24).length / border.length < .94) return false;
+  if (border.filter(index => distance(index) < 13).length / border.length < .975) return false;
 
   const size = width * height;
   const visited = new Uint8Array(size);
@@ -80,7 +80,53 @@ function removeFlatBackground(pixels) {
   }
   if (count < size * .20 || count > size * .98) return false;
   for (let i = 0; i < count; i++) data[queue[i] * 4 + 3] = 0;
-  return true;
+
+  const { largest, retained } = cleanMask(pixels);
+  return largest >= retained * .97 && largest >= (size - count) * .95;
+}
+
+function cleanMask({ data, width, height }) {
+  const size = width * height;
+  const labels = new Int32Array(size);
+  const queue = new Int32Array(size);
+  const sizes = [0];
+  let largest = 0;
+
+  for (let start = 0; start < size; start++) {
+    if (labels[start] || data[start * 4 + 3] <= 45) continue;
+    const label = sizes.length;
+    let end = 0;
+    function add(index) {
+      if (labels[index] || data[index * 4 + 3] <= 45) return;
+      labels[index] = label;
+      queue[end++] = index;
+    }
+
+    add(start);
+    for (let head = 0; head < end; head++) {
+      const index = queue[head];
+      const x = index % width;
+      const left = x > 0 ? -1 : 0;
+      const right = x + 1 < width ? 1 : 0;
+      for (let dx = left; dx <= right; dx++) {
+        if (index >= width) add(index - width + dx);
+        if (dx) add(index + dx);
+        if (index + width < size) add(index + width + dx);
+      }
+    }
+    sizes.push(end);
+    largest = Math.max(largest, end);
+  }
+
+  const cutoff = Math.min(largest, Math.max(8, largest * .012));
+  let retained = 0;
+  for (let index = 0; index < size; index++) {
+    const label = labels[index];
+    if (!label) continue;
+    if (sizes[label] < cutoff) data[index * 4 + 3] = 0;
+    else retained++;
+  }
+  return { largest, retained };
 }
 
 async function trimAndEncode(canvas, ctx) {
@@ -124,7 +170,7 @@ function deadline(promise, milliseconds) {
   ]).finally(() => clearTimeout(timer));
 }
 
-export async function makeCutout(file, onProgress) {
+export async function makeCutout(file, onProgress, { forceModel = false, detailed = false } = {}) {
   let source;
   try {
     source = await canvasFrom(file, 896);
@@ -134,24 +180,37 @@ export async function makeCutout(file, onProgress) {
   const { canvas, ctx } = source;
   const pixels = rgba(canvas, ctx);
   if (hasTransparency(pixels.data)) return { blob: await trimAndEncode(canvas, ctx), method: 'transparent' };
-  if (removeFlatBackground(pixels)) {
-    ctx.putImageData(pixels, 0, 0);
-    return { blob: await trimAndEncode(canvas, ctx), method: 'flat' };
+  if (!forceModel && removeFlatBackground(pixels)) {
+    const fast = document.createElement('canvas');
+    fast.width = canvas.width;
+    fast.height = canvas.height;
+    const fastCtx = fast.getContext('2d', { willReadFrequently: true });
+    fastCtx.putImageData(pixels, 0, 0);
+    try {
+      return { blob: await trimAndEncode(fast, fastCtx), method: 'flat' };
+    } catch {
+      // The color-based mask can remove too much of a small object.
+    }
   }
 
-  onProgress('복잡한 배경을 분리하는 중이에요. 처음에는 모델을 내려받는 시간이 걸려요.');
+  onProgress(detailed
+    ? '더 정밀하게 물건의 윤곽을 찾는 중이에요.'
+    : '물건의 윤곽을 분석하는 중이에요. 처음에는 시간이 걸릴 수 있어요.');
   let result;
   try {
     const input = await encode(canvas, 'image/png');
     result = await deadline((async () => {
       const { removeBackground } = await import(MODEL_MODULE);
-      return removeBackground(input, { model: 'small', output: { format: 'image/png' } });
-    })(), 55000);
+      return removeBackground(input, { model: detailed ? 'medium' : 'small', output: { format: 'image/png' } });
+    })(), detailed ? 120000 : 90000);
   } catch {
     throw new Error('배경 제거 모델을 불러오지 못했어요. 다시 시도하거나 단색 배경에서 찍은 사진을 올려주세요.');
   }
   const cut = await canvasFrom(result, 896);
-  return { blob: await trimAndEncode(cut.canvas, cut.ctx), method: 'model' };
+  const mask = rgba(cut.canvas, cut.ctx);
+  cleanMask(mask);
+  cut.ctx.putImageData(mask, 0, 0);
+  return { blob: await trimAndEncode(cut.canvas, cut.ctx), method: detailed ? 'detailed' : 'model' };
 }
 
 export function toDataUrl(blob) {
