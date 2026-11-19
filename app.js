@@ -74,8 +74,7 @@ function openStory(entry) {
   get('story-title').textContent = entry.name;
   get('story-meta').textContent = entry.duration + ' 함께한 물건' + (entry.example ? ' · 예시 기록' : '');
   get('story-text').textContent = entry.story;
-  const view = currentView();
-  const deleteButton = view === 'pile' || view === 'bag' ? makeDeleteButton(entry) : null;
+  const deleteButton = currentView() === 'words' ? null : makeDeleteButton(entry);
   storyActions.replaceChildren();
   if (deleteButton) storyActions.append(deleteButton);
   storyActions.hidden = !deleteButton;
@@ -226,9 +225,16 @@ form.addEventListener('submit', async event => {
   const fields = new FormData(form);
   const name = fields.get('name').trim();
   const duration = fields.get('duration').trim();
-  const story = fields.get('story').trim();
-  if (!name || !duration || !story) {
-    formError.textContent = '물건의 이름, 함께한 시간, 이야기를 입력해주세요.';
+  const story = fields.getAll('answer')
+    .map(answer => answer.trim())
+    .filter(Boolean)
+    .join('\n\n');
+  if (!name || !duration) {
+    formError.textContent = '물건의 이름과 함께한 시간을 입력해주세요.';
+    return;
+  }
+  if (!story) {
+    formError.textContent = '질문에 하나 이상 답해주세요.';
     return;
   }
 
