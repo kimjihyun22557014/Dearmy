@@ -7,7 +7,7 @@
   <title>Dear My (?) — 나의 애착 물건 아카이브</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='11' fill='%232640ce'/%3E%3Ctext x='32' y='48' text-anchor='middle' fill='white' font-family='serif' font-size='49'%3E%3F%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css?v=question-fields">
-  <script type="module" src="./app.js?v=archive-delete"></script>
+  <script type="module" src="./app.js?v=heic-upload"></script>
 </head>
 <body>
   <main class="desk">
@@ -48,8 +48,8 @@
     <form id="upload-form">
       <div class="upload-images">
         <label for="photo">물건 사진
-          <span>물건 하나가 잘 보이는 사진을 올려주세요.</span>
-          <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" required>
+          <span>물건 하나가 잘 보이는 사진을 올려주세요. 아이폰 HEIC 사진도 가능해요.</span>
+          <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,.heic,.heif,.heics,.heifs" required>
         </label>
         <div class="previews" hidden>
           <figure><img id="original" alt="배경 제거 전"><figcaption>원본</figcaption></figure>

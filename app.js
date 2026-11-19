@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { makeCutout, toDataUrl } from './photo.js?v=cutout-quality';
+import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
 import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
 import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=delete-record';
 
@@ -37,7 +37,7 @@ const notice = get('notice');
 
 let records = [];
 let pile, bagOffset = 0, latestId;
-let selectedImage, originalUrl, cutoutUrl, requestVersion = 0, entryId;
+let selectedImage, preparedPhoto, originalUrl, cutoutUrl, requestVersion = 0, entryId;
 let saving = false, preparingPhoto = false;
 
 function currentView() {
@@ -131,7 +131,7 @@ action.addEventListener('click', () => {
 
 function clearPhoto() {
   requestVersion++;
-  selectedImage = undefined;
+  selectedImage = preparedPhoto = undefined;
   preparingPhoto = false;
   if (originalUrl) URL.revokeObjectURL(originalUrl);
   if (cutoutUrl) URL.revokeObjectURL(cutoutUrl);
@@ -165,16 +165,24 @@ async function preparePhoto({ retry = false } = {}) {
   preparingPhoto = true;
   retryPhoto.hidden = true;
   publish.disabled = true;
-  if (!retry) {
-    originalUrl = URL.createObjectURL(file);
-    original.src = originalUrl;
-    original.closest('.previews').hidden = false;
-  }
-  processing.textContent = '사진에서 물건을 찾는 중이에요.';
+  const showProgress = message => {
+    if (requestVersion === version) processing.textContent = message;
+  };
+  showProgress('사진을 읽는 중이에요.');
   try {
-    const { blob, method } = await makeCutout(file, message => {
-      if (requestVersion === version) processing.textContent = message;
-    }, { forceModel: retry, detailed: retry && cutoutMethod === 'model' });
+    if (!preparedPhoto) {
+      const decoded = await prepareImageFile(file, showProgress);
+      if (requestVersion !== version) return;
+      preparedPhoto = decoded;
+      originalUrl = URL.createObjectURL(decoded);
+      original.src = originalUrl;
+      original.closest('.previews').hidden = false;
+    }
+    showProgress('사진에서 물건을 찾는 중이에요.');
+    const { blob, method } = await makeCutout(preparedPhoto, showProgress, {
+      forceModel: retry,
+      detailed: retry && cutoutMethod === 'model',
+    });
     if (requestVersion !== version) return;
     selectedImage = blob;
     cutoutMethod = method;
@@ -189,7 +197,7 @@ async function preparePhoto({ retry = false } = {}) {
     if (requestVersion !== version) return;
     processing.textContent = error.message || '배경을 지우는 중에 문제가 생겼어요.';
     if (selectedImage) processing.textContent += ' 이전 미리보기는 그대로 사용할 수 있어요.';
-    retryPhoto.textContent = '배경 제거 다시 시도';
+    retryPhoto.textContent = preparedPhoto ? '배경 제거 다시 시도' : '사진 다시 불러오기';
     retryPhoto.hidden = false;
   } finally {
     if (requestVersion === version) {

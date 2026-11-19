@@ -1,4 +1,61 @@
 const MAX_OUTPUT = 220000;
+const HEIC_DECODER = 'https://cdn.jsdelivr.net/npm/heic-to@1.6.7/dist/iife/heic-to.js';
+
+let heicDecoder;
+
+async function isHeicPhoto(file) {
+  if (/^image\/hei[cf](?:-sequence)?$/i.test(file.type) || /\.hei[cf]s?$/i.test(file.name)) return true;
+
+  const bytes = new Uint8Array(await file.slice(0, 80).arrayBuffer());
+  const header = new TextDecoder().decode(bytes);
+  if (header.slice(4, 8) !== 'ftyp') return false;
+  const brands = [header.slice(8, 12)];
+  const box = new DataView(bytes.buffer).getUint32(0);
+  for (let offset = 16; offset + 4 <= Math.min(box, bytes.length); offset += 4) {
+    brands.push(header.slice(offset, offset + 4));
+  }
+  if (brands.some(brand => brand === 'avif' || brand === 'avis')) return false;
+  return brands.some(brand => ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'hevm', 'hevs', 'mif1', 'msf1'].includes(brand));
+}
+
+function loadHeicDecoder() {
+  if (!heicDecoder) {
+    const script = document.createElement('script');
+    script.src = HEIC_DECODER;
+    heicDecoder = deadline(new Promise((resolve, reject) => {
+      script.onload = () => {
+        if (typeof window.HeicTo === 'function') resolve(window.HeicTo);
+        else reject(new Error('HEIC decoder unavailable'));
+      };
+      script.onerror = () => reject(new Error('HEIC decoder unavailable'));
+      document.head.append(script);
+    }), 25000).catch(error => {
+      script.remove();
+      heicDecoder = undefined;
+      throw error;
+    });
+  }
+  return heicDecoder;
+}
+
+export async function prepareImageFile(file, onProgress) {
+  if (!await isHeicPhoto(file)) return file;
+
+  onProgress('HEIC 사진을 여는 중이에요.');
+  try {
+    const { canvas } = await canvasFrom(file, 1600);
+    return await encode(canvas, 'image/jpeg', .92);
+  } catch {
+    // Use the HEIC decoder when the browser cannot open the original directly.
+  }
+
+  try {
+    const convert = await loadHeicDecoder();
+    return await deadline(convert({ blob: file, type: 'image/jpeg', quality: .92 }), 45000);
+  } catch {
+    throw new Error('HEIC 사진을 열지 못했어요. 다시 시도하거나 JPG로 저장해 올려주세요.');
+  }
+}
 const MODEL_MODULE = 'https://esm.sh/@imgly/background-removal@1.7.0?bundle';
 
 async function canvasFrom(blob, maxSide) {
