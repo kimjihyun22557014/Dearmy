@@ -143,7 +143,7 @@ p, h1, h2, figure { margin: 0; }
   }
 }
 .word-entry h3 { font-size: .8rem; margin: 0 0 12px; color: var(--ink); }
-.word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.09em; line-height: 1.34; white-space: pre-wrap; overflow-wrap: anywhere; }
+.word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.09em; line-height: 1.34; white-space: normal; overflow-wrap: anywhere; }
 .inline-object { display: inline-block; background: transparent; border: 0; width: 1.55em; height: 1.25em; padding: 0 .07em; vertical-align: -.32em; }
 .inline-object img { width: 100%; height: 100%; object-fit: contain; }
 .bag-shell { position: absolute; inset: 23% 14% 16%; border: 2px solid #294983; border-radius: 24% 25% 25% 24% / 27% 28% 24% 28%; transform: rotate(-3deg); background: linear-gradient(147deg,#567dc26b,#a0d2f128 35%,#fff6 53%,#7998ed49 69%,#284e9f72); box-shadow: inset 0 0 28px #416ac05f, 5px 16px 35px #283b5e2a; }
