@@ -1,4 +1,5 @@
 :root {
+  --button-green: #17583f;
   color-scheme: light;
   --white: #fff;
   --ink: #121212;
@@ -17,10 +18,8 @@ a { color: inherit; }
 [hidden] { display: none !important; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 p, h1, h2, figure { margin: 0; }
-.top { position: absolute; z-index: 2; top: 23px; left: clamp(16px, 3.4vw, 68px); }
-.brand { font-size: .94rem; font-weight: 600; letter-spacing: -.045em; text-decoration: none; }
 .primary { display: inline-flex; gap: .6em; align-items: center; justify-content: center; background: none; border: 0; padding: 9px 0; font-size: .88rem; }
-.primary:hover, .brand:hover, #view-action:hover, #retry-photo:hover { text-decoration: underline; text-underline-offset: .27em; }
+.primary:hover, #view-action:hover, #retry-photo:hover { text-decoration: underline; text-underline-offset: .27em; }
 .desk {
   --edge: clamp(14px, 2vw, 40px);
   position: relative;
@@ -45,6 +44,7 @@ p, h1, h2, figure { margin: 0; }
   letter-spacing: -.085em;
   white-space: nowrap;
 }
+.wordmark-question { color: var(--button-green); }
 .intro p { font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.45; }
 .upload-cta {
   display: grid;
@@ -64,8 +64,8 @@ p, h1, h2, figure { margin: 0; }
   transition: transform .16s ease;
 }
 .upload-note {
-  color: #17583f;
-  font: 300 1rem/1.15 "Gaegu", "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
+  color: var(--button-green);
+  font: 300 1rem/1.15 "Apple SD Gothic Neo", "Malgun Gothic Semilight", "Noto Sans KR", sans-serif;
   letter-spacing: .015em;
 }
 .upload-cta:is(:hover, :focus-visible) .upload-note { text-decoration: underline; text-underline-offset: .25em; }
@@ -189,7 +189,6 @@ textarea { resize: vertical; margin-top: 9px; }
   .tabs { left: var(--edge); top: 64px; gap: 4px; }
 }
 @media (max-width: 580px) {
-  .top { top: 17px; }
   .intro { padding-bottom: 9px; }
   .wordmark { font-size: clamp(2.3rem, 9.2vw, 3.4rem); }
   .intro p { font-size: .83rem; }
