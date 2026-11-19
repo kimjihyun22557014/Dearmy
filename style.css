@@ -36,59 +36,37 @@ p, h1, h2, figure { margin: 0; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: clamp(168px, 22svh, 260px);
-  padding: 27px 0 14px;
+  padding: clamp(39px, 5svh, 58px) 0 17px;
   text-align: center;
 }
 .wordmark {
-  display: flex;
-  align-items: center;
-  gap: .12em;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
   font: 400 clamp(3rem, 6.35vw, 7rem)/.98 Arial, sans-serif;
   letter-spacing: -.085em;
   white-space: nowrap;
 }
-.wordmark h1 { font: inherit; letter-spacing: inherit; }
-.heart-brackets { display: flex; align-items: center; letter-spacing: 0; }
 .intro p { font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.45; }
 .upload-cta {
-  position: relative;
   display: grid;
-  place-items: center;
-  padding: 0;
+  justify-items: center;
+  gap: 1px;
+  margin-top: 9px;
   min-width: 44px;
   min-height: 44px;
+  padding: 0 6px 3px;
   border: 0;
   background: none;
-  color: var(--ink);
 }
 .upload-cta img {
   display: block;
-  width: .91em;
+  width: clamp(42px, 4.2vw, 56px);
   height: auto;
   transition: transform .16s ease;
 }
 .upload-note {
-  --arrow-width: clamp(92px, 10vw, 148px);
-  position: absolute;
-  left: calc(50% + var(--arrow-width) - 17px);
-  top: 90%;
-  padding: 3px 2px 7px;
   color: #762439;
-  font: 300 clamp(1.13rem, 1.65vw, 1.5rem)/1.15 "Gaegu", "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-.upload-note::before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  right: calc(100% - 12px);
-  width: var(--arrow-width);
-  height: 38px;
-  background: url("./assets/upload-arrow.png") center / 100% 100% no-repeat;
-  pointer-events: none;
+  font: 300 1rem/1.15 "Gaegu", "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
+  letter-spacing: .015em;
 }
 .upload-cta:is(:hover, :focus-visible) .upload-note { text-decoration: underline; text-underline-offset: .25em; }
 .upload-cta:hover img { transform: translateY(-2px); }
@@ -187,22 +165,10 @@ textarea { resize: vertical; margin-top: 9px; }
 #form-error { color: #9c1d1d; font-size: .83rem; margin-top: 7px; }
 @media (max-width: 900px) {
   .tabs { left: var(--edge); top: 64px; gap: 4px; }
-  .intro { min-height: 168px; }
-}
-@media (max-width: 700px) {
-  .wordmark { margin-bottom: 41px; }
-  .upload-note {
-    --arrow-width: 54px;
-    left: auto;
-    right: -.45rem;
-    top: calc(100% + 12px);
-    padding: 0 2px 4px;
-  }
-  .upload-note::before { top: -17px; right: 0; height: 22px; }
 }
 @media (max-width: 580px) {
   .top { top: 17px; }
-  .intro { min-height: 148px; padding: 39px 0 9px; }
+  .intro { padding-bottom: 9px; }
   .wordmark { font-size: clamp(2.3rem, 9.2vw, 3.4rem); }
   .intro p { font-size: .83rem; }
   .tabs { position: static; gap: 1px; width: fit-content; }
