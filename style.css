@@ -167,7 +167,7 @@ dialog .bar button { min-width: 34px; }
 #upload-form { padding: clamp(12px, 4vw, 25px); }
 #upload-form label { display: block; font-size: .9rem; font-weight: 700; }
 .upload-images { padding-bottom: 14px; margin-bottom: 15px; border-bottom: 1px solid var(--line); }
-.upload-images label span, .guide-intro, .guide span, #processing, #storage-note { display: block; font-size: .78rem; font-weight: 400; color: var(--muted); line-height: 1.55; margin-top: 4px; }
+.upload-images label span, .question-help, #processing, #storage-note { display: block; font-size: .78rem; font-weight: 400; color: var(--muted); line-height: 1.55; margin-top: 4px; }
 .upload-images input { display: block; width: 100%; margin: 10px 0 0; }
 .previews { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 13px; }
 .previews figure { display: grid; grid-template-rows: 115px auto; border: 1px solid var(--line); }
@@ -176,12 +176,10 @@ dialog .bar button { min-width: 34px; }
 .previews figcaption { grid-row: 2; text-align: center; font-size: .74rem; padding: 4px; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 17px; }
 .fields input, textarea { width: 100%; background: white; border: 1px solid #b5b5b5; padding: 9px; margin-top: 5px; font-size: 1rem; font-weight: 400; }
-textarea { resize: vertical; margin-top: 9px; }
-.guide { margin: 8px 0; padding-left: 23px; font-size: .83rem; }
-.guide li + li { margin-top: 7px; }
-.extra-guide { font-size: .82rem; color: var(--ink); margin: 10px 0; }
-.extra-guide summary { cursor: pointer; }
-.extra-guide .guide { color: var(--ink); }
+textarea { display: block; resize: vertical; line-height: 1.45; }
+.story-questions { min-width: 0; margin: 0; padding: 0; border: 0; }
+.story-questions legend { padding: 0; font-size: .9rem; font-weight: 700; }
+.question-field { margin-top: 12px; }
 .form-end { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
 .form-end button { flex-shrink: 0; text-decoration: underline; text-underline-offset: .25em; }
 #form-error { color: #9c1d1d; font-size: .83rem; margin-top: 7px; }

@@ -6,7 +6,7 @@
   <meta name="description" content="자주 쓰거나 곁에 두는 물건과 그 이야기를 모으는 온라인 참여 아카이브.">
   <title>Dear My (?) — 나의 애착 물건 아카이브</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='11' fill='%232640ce'/%3E%3Ctext x='32' y='48' text-anchor='middle' fill='white' font-family='serif' font-size='49'%3E%3F%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./style.css?v=question-fields">
+  <link rel="stylesheet" href="./style.css?v=open-questions">
   <script type="module" src="./app.js?v=heic-upload"></script>
 </head>
 <body>
@@ -73,17 +73,14 @@
           <label for="answer-change">2. 이 물건 덕분에 그 시간이 어떻게 달라졌나요?</label>
           <textarea id="answer-change" name="answer" maxlength="240" rows="2" placeholder="예. 좋아하는 음악을 들으니 등굣길이 덜 지루해요."></textarea>
         </div>
-        <details class="extra-guide">
-          <summary>다른 질문 보기</summary>
-          <div class="question-field">
-            <label for="answer-origin">3. 이 물건은 어디서, 어떻게 구했나요?</label>
-            <textarea id="answer-origin" name="answer" maxlength="240" rows="2" placeholder="예. 입학 선물로 친구에게 받았어요."></textarea>
-          </div>
-          <div class="question-field">
-            <label for="answer-favorite">4. 이 물건에서 가장 마음에 드는 점은 뭔가요?</label>
-            <textarea id="answer-favorite" name="answer" maxlength="240" rows="2" placeholder="예. 주머니에 쏙 들어가는 크기가 좋아요."></textarea>
-          </div>
-        </details>
+        <div class="question-field">
+          <label for="answer-origin">3. 이 물건은 어디서, 어떻게 구했나요?</label>
+          <textarea id="answer-origin" name="answer" maxlength="240" rows="2" placeholder="예. 입학 선물로 친구에게 받았어요."></textarea>
+        </div>
+        <div class="question-field">
+          <label for="answer-favorite">4. 이 물건에서 가장 마음에 드는 점은 뭔가요?</label>
+          <textarea id="answer-favorite" name="answer" maxlength="240" rows="2" placeholder="예. 주머니에 쏙 들어가는 크기가 좋아요."></textarea>
+        </div>
       </fieldset>
       <div class="form-end"><p id="storage-note"></p><button id="publish" type="submit" class="primary" disabled>등록하기 <span aria-hidden="true">↗</span></button></div>
       <p id="form-error" role="alert"></p>
