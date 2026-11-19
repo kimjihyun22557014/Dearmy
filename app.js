@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, toDataUrl } from './photo.js?v=cutout-quality';
-import { loadEntries, saveEntry, shared, invalidConfig } from './store.js';
-import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=wide-pile';
+import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
+import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=delete-record';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
@@ -14,7 +14,7 @@ const examples = [
 
 const views = {
   pile: { title: '쏟아진 물건', action: '다시 떨어뜨리기', hint: '클릭하면 움직이고, 더블클릭하면 이야기가 열려요.' },
-  archive: { title: '전체 기록', hint: '물건을 선택하면 사진과 이야기를 읽을 수 있어요.' },
+  archive: { title: '모아둔 물건', hint: '물건을 선택하면 사진과 이야기를 읽을 수 있어요.' },
   words: { title: '문장 속 물건', hint: '이야기 사이에 놓인 물건을 찾아보세요.' },
   bag: { title: '가방 속 물건', action: '다른 물건 담기', hint: '물건을 끌어 꺼내고, 더블클릭해서 이야기를 열어보세요.' },
 };
@@ -23,6 +23,7 @@ const get = id => document.getElementById(id);
 const scene = get('scene');
 const action = get('view-action');
 const storyDialog = get('story');
+const storyActions = get('story-actions');
 const uploadDialog = get('upload');
 const form = get('upload-form');
 const photo = get('photo');
@@ -44,12 +45,40 @@ function currentView() {
   return Object.hasOwn(views, hash) ? hash : 'pile';
 }
 
+function makeDeleteButton(entry) {
+  if (shared || entry.example || !records.some(record => record.id === entry.id)) return null;
+  const control = element('button', 'delete-record');
+  control.type = 'button';
+  control.setAttribute('aria-label', entry.name + ' 기록 삭제');
+  control.title = '기록 삭제';
+  control.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5m4-5v5"/></svg>';
+  control.addEventListener('click', () => {
+    if (!window.confirm('‘' + entry.name + '’ 기록을 삭제할까요?')) return;
+    try {
+      records = deleteLocalEntry(entry.id);
+    } catch {
+      window.alert('기록을 삭제하지 못했어요. 다시 시도해주세요.');
+      return;
+    }
+    if (storyDialog.open) storyDialog.close();
+    render();
+    document.querySelector('[data-view][aria-current="page"]')?.focus({ preventScroll: true });
+    notice.textContent = '기록을 삭제했어요.';
+  });
+  return control;
+}
+
 function openStory(entry) {
   get('story-image').src = entry.image;
   get('story-image').alt = entry.name;
   get('story-title').textContent = entry.name;
   get('story-meta').textContent = entry.duration + ' 함께한 물건' + (entry.example ? ' · 예시 기록' : '');
   get('story-text').textContent = entry.story;
+  const view = currentView();
+  const deleteButton = view === 'pile' || view === 'bag' ? makeDeleteButton(entry) : null;
+  storyActions.replaceChildren();
+  if (deleteButton) storyActions.append(deleteButton);
+  storyActions.hidden = !deleteButton;
   storyDialog.showModal();
 }
 
@@ -82,7 +111,7 @@ function render() {
   switch (view) {
     case 'pile': pile = pileScene(scene, entries, openStory, latestId); latestId = undefined; break;
     case 'archive': archiveScene(scene, entries, openStory); break;
-    case 'words': wordsScene(scene, entries, openStory); break;
+    case 'words': wordsScene(scene, entries, openStory, makeDeleteButton); break;
     case 'bag': bagScene(scene, entries, openStory, bagOffset); break;
   }
 }

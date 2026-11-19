@@ -7,8 +7,8 @@
   <title>Dear My (?) — 나의 애착 물건 아카이브</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='11' fill='%232640ce'/%3E%3Ctext x='32' y='48' text-anchor='middle' fill='white' font-family='serif' font-size='49'%3E%3F%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300&amp;display=swap&amp;text=%EC%95%A0%EC%B0%A9%EB%AC%BC%EA%B1%B4%EC%98%AC%EB%A6%AC%EA%B8%B0">
-  <link rel="stylesheet" href="./style.css?v=heart-below-title">
-  <script type="module" src="./app.js?v=cutout-quality"></script>
+  <link rel="stylesheet" href="./style.css?v=delete-record">
+  <script type="module" src="./app.js?v=delete-record"></script>
 </head>
 <body>
   <header class="top">
@@ -25,9 +25,9 @@
     </div>
     <nav class="tabs" aria-label="아카이브 보기">
       <a href="#pile" data-view="pile">쏟아진 물건</a>
-      <a href="#archive" data-view="archive">전체 기록</a>
       <a href="#words" data-view="words">문장 속 물건</a>
       <a href="#bag" data-view="bag">가방 속 물건</a>
+      <a href="#archive" data-view="archive">모아둔 물건</a>
     </nav>
     <section class="window" aria-labelledby="view-title">
       <div class="bar">
@@ -45,6 +45,7 @@
       <img id="story-image" alt="">
       <div><p id="story-meta" class="meta"></p><h2 id="story-title"></h2><p id="story-text"></p></div>
     </div>
+    <footer id="story-actions" class="story-actions" hidden></footer>
   </dialog>
   <dialog id="upload" aria-labelledby="upload-title">
     <div class="bar"><h2 id="upload-title">물건 올리기</h2><button type="button" data-close aria-label="닫기">✕</button></div>

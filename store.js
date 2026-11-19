@@ -6,6 +6,20 @@ export const invalidConfig = Boolean(config.supabaseUrl) !== Boolean(config.publ
 
 const storageKey = 'dear-my-archive-records-v1';
 
+function readLocalEntries() {
+  return JSON.parse(localStorage.getItem(storageKey) || '[]');
+}
+
+export function deleteLocalEntry(id) {
+  if (shared || id.startsWith('example-')) throw new Error('삭제할 수 없는 기록이에요.');
+  const records = readLocalEntries();
+  const remaining = records.filter(record => record.id !== id);
+  if (remaining.length !== records.length) {
+    localStorage.setItem(storageKey, JSON.stringify(remaining));
+  }
+  return remaining;
+}
+
 async function request(query, init = {}) {
   const target = new URL(config.supabaseUrl);
   if (target.protocol !== 'https:') throw new Error('Supabase URL은 HTTPS 주소여야 해요.');
@@ -21,10 +35,7 @@ async function request(query, init = {}) {
 }
 
 export async function loadEntries() {
-  if (!shared || invalidConfig) {
-    const records = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    return records;
-  }
+  if (!shared || invalidConfig) return readLocalEntries();
   const rows = [];
   const pageSize = 24;
   for (let offset = 0; ; offset += pageSize) {
@@ -39,7 +50,7 @@ export async function loadEntries() {
 export async function saveEntry(entry) {
   if (invalidConfig) throw new Error('공동 아카이브 설정을 확인해주세요.');
   if (!shared) {
-    const previous = await loadEntries();
+    const previous = readLocalEntries();
     const entries = [entry, ...previous.filter(record => record.id !== entry.id)];
     localStorage.setItem(storageKey, JSON.stringify(entries));
     return;

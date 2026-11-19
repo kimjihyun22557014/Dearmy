@@ -230,7 +230,7 @@ export function storyImageOffset(text, name) {
   return space < 0 ? text.length : space;
 }
 
-export function wordsScene(parent, entries, openStory) {
+export function wordsScene(parent, entries, openStory, makeDeleteButton) {
   const spread = element('div', 'words');
   for (const entry of entries) {
     const article = element('article', 'word-entry');
@@ -244,6 +244,8 @@ export function wordsScene(parent, entries, openStory) {
     const index = storyImageOffset(entry.story, entry.name);
     copy.append(entry.story.slice(0, index).trimEnd(), ' ', marker, ' ', entry.story.slice(index).trimStart());
     article.append(element('h3', '', entry.name + ' · ' + entry.duration + (entry.example ? ' · 예시' : '')), copy);
+    const deleteButton = makeDeleteButton?.(entry);
+    if (deleteButton) article.append(deleteButton);
     spread.append(article);
   }
   parent.append(spread);
