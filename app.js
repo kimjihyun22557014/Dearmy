@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
 import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
-import { element, pileScene, archiveScene, wordsScene, bagScene } from './scenes.js?v=delete-record';
+import { element, wordsScene } from './scenes.js?v=single-archive';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
@@ -12,16 +12,14 @@ const examples = [
   ['mug', '노란 머그컵', '5년', '아침에 노란 머그컵에 따뜻한 물을 따라요. 손잡이에 손가락 두 개가 꼭 맞아서 다른 컵이 있어도 이걸 먼저 집게 돼요.'],
 ].map(([id, name, duration, story]) => ({ id: 'example-' + id, image: './assets/' + id + '.png', name, duration, story, example: true }));
 
-const views = {
-  pile: { title: '쏟아진 물건', action: '다시 떨어뜨리기', hint: '클릭하면 움직이고, 더블클릭하면 이야기가 열려요.' },
-  archive: { title: '모아둔 물건', hint: '물건을 선택하면 사진과 이야기를 읽을 수 있어요.' },
-  words: { title: '문장 속 물건', hint: '이야기 사이에 놓인 물건을 찾아보세요.' },
-  bag: { title: '가방 속 물건', action: '다른 물건 담기', hint: '물건을 끌어 꺼내고, 더블클릭해서 이야기를 열어보세요.' },
-};
+const ENTRIES_PER_PAGE = 10;
 
 const get = id => document.getElementById(id);
 const scene = get('scene');
-const action = get('view-action');
+const pagination = get('pagination');
+const previousPage = get('previous-page');
+const nextPage = get('next-page');
+const pageNumber = get('page-number');
 const storyDialog = get('story');
 const storyActions = get('story-actions');
 const uploadDialog = get('upload');
@@ -36,14 +34,9 @@ const formError = get('form-error');
 const notice = get('notice');
 
 let records = [];
-let pile, bagOffset = 0, latestId;
+let page = 1;
 let selectedImage, preparedPhoto, originalUrl, cutoutUrl, requestVersion = 0, entryId;
 let saving = false, preparingPhoto = false;
-
-function currentView() {
-  const hash = location.hash.slice(1);
-  return Object.hasOwn(views, hash) ? hash : 'pile';
-}
 
 function makeDeleteButton(entry) {
   if (shared || entry.example || !records.some(record => record.id === entry.id)) return null;
@@ -62,7 +55,7 @@ function makeDeleteButton(entry) {
     }
     if (storyDialog.open) storyDialog.close();
     render();
-    document.querySelector('[data-view][aria-current="page"]')?.focus({ preventScroll: true });
+    scene.focus({ preventScroll: true });
     notice.textContent = '기록을 삭제했어요.';
   });
   return control;
@@ -74,60 +67,40 @@ function openStory(entry) {
   get('story-title').textContent = entry.name;
   get('story-meta').textContent = entry.duration + ' 함께한 물건' + (entry.example ? ' · 예시 기록' : '');
   get('story-text').textContent = entry.story;
-  const deleteButton = currentView() === 'words' ? null : makeDeleteButton(entry);
+  const deleteButton = makeDeleteButton(entry);
   storyActions.replaceChildren();
   if (deleteButton) storyActions.append(deleteButton);
   storyActions.hidden = !deleteButton;
   storyDialog.showModal();
 }
 
-function allEntries() {
-  return config.showExamples ? [...records, ...examples] : records;
-}
-
 function render() {
-  const view = currentView();
-  const entries = allEntries();
-  pile?.dispose();
-  pile = undefined;
+  const entries = config.showExamples ? [...records, ...examples] : records;
+  const totalPages = Math.max(1, Math.ceil(entries.length / ENTRIES_PER_PAGE));
+  page = Math.min(Math.max(page, 1), totalPages);
+  const start = (page - 1) * ENTRIES_PER_PAGE;
+
   scene.replaceChildren();
-  for (const tab of document.querySelectorAll('[data-view]')) {
-    if (tab.dataset.view === view) tab.setAttribute('aria-current', 'page');
-    else tab.removeAttribute('aria-current');
+  if (entries.length) {
+    wordsScene(scene, entries.slice(start, start + ENTRIES_PER_PAGE), openStory, makeDeleteButton);
+  } else {
+    scene.append(element('p', 'empty', '아직 등록된 물건이 없어요. 첫 물건을 올려보세요.'));
   }
-  get('view-title').textContent = views[view].title;
-  const usingTouch = matchMedia('(pointer: coarse)').matches;
-  const touchHints = { pile: '물건을 탭해서 움직이고, 이야기 보기 버튼을 눌러 글을 읽어보세요.', bag: '물건을 끌어 꺼내고, 이야기 보기 버튼을 눌러 글을 읽어보세요.' };
-  get('hint').textContent = (usingTouch && touchHints[view]) || views[view].hint;
-  get('count').textContent = '등록 ' + records.length + '개' + (config.showExamples ? ' · 예시 ' + examples.length + '개' : '');
-  action.textContent = views[view].action || '';
-  action.hidden = !entries.length || !views[view].action || (view === 'bag' && entries.length < 6);
-
-  if (!entries.length) {
-    scene.append(element('p', 'empty', '아직 등록된 물건이 없어요. 물건 하나를 처음으로 올려보세요.'));
-    return;
-  }
-  switch (view) {
-    case 'pile': pile = pileScene(scene, entries, openStory, latestId); latestId = undefined; break;
-    case 'archive': archiveScene(scene, entries, openStory); break;
-    case 'words': wordsScene(scene, entries, openStory, makeDeleteButton); break;
-    case 'bag': bagScene(scene, entries, openStory, bagOffset); break;
-  }
+  pagination.hidden = totalPages === 1;
+  previousPage.disabled = page === 1;
+  nextPage.disabled = page === totalPages;
+  pageNumber.textContent = page + ' / ' + totalPages;
 }
 
-function switchView() {
+function goToPage(number) {
+  page = number;
   render();
-  if (currentView() === 'words') get('view-title').scrollIntoView({ block: 'nearest' });
+  scene.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
 }
 
-window.addEventListener('hashchange', switchView);
-action.addEventListener('click', () => {
-  if (currentView() === 'pile') pile?.reset();
-  if (currentView() === 'bag') {
-    bagOffset = (bagOffset + 5) % allEntries().length;
-    render();
-  }
-});
+previousPage.addEventListener('click', () => goToPage(page - 1));
+nextPage.addEventListener('click', () => goToPage(page + 1));
 
 function clearPhoto() {
   requestVersion++;
@@ -253,12 +226,9 @@ form.addEventListener('submit', async event => {
     const entry = { id: entryId, name, duration, story, image: await toDataUrl(selectedImage) };
     await saveEntry(entry);
     records = [entry, ...records.filter(record => record.id !== entry.id)];
-    latestId = entry.id;
     notice.textContent = shared ? '물건을 공동 아카이브에 올렸어요.' : '물건을 이 브라우저에 저장했어요.';
     uploadDialog.close();
-    if (currentView() !== 'pile') location.hash = 'pile';
-    else render();
-    get('view-title').scrollIntoView({ block: 'nearest' });
+    goToPage(1);
   } catch (error) {
     formError.textContent = error.name === 'QuotaExceededError'
       ? '브라우저 저장 공간이 가득 찼어요.'
