@@ -40,8 +40,13 @@ p, h1, h2, figure { margin: 0; }
 .upload-cta {
   position: fixed;
   z-index: 5;
-  right: max(12px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  --float-left: max(16px, env(safe-area-inset-left));
+  --float-right: max(16px, env(safe-area-inset-right));
+  --float-top: max(16px, env(safe-area-inset-top));
+  --float-bottom: max(16px, env(safe-area-inset-bottom));
+  left: calc(100% - var(--float-right));
+  top: calc(100% - var(--float-bottom));
+  transform: translate(-100%, -100%);
   display: grid;
   justify-items: center;
   gap: 1px;
@@ -49,9 +54,8 @@ p, h1, h2, figure { margin: 0; }
   min-height: 44px;
   padding: 5px 8px;
   border: 0;
-  border-radius: 12px;
-  background: var(--white);
-  animation: float-upload 22s ease-in-out infinite;
+  background: transparent;
+  animation: float-upload 42s ease-in-out infinite;
 }
 .upload-cta img {
   display: block;
@@ -69,10 +73,41 @@ p, h1, h2, figure { margin: 0; }
 .upload-cta:active img { transform: translateY(1px); }
 .upload-cta:is(:hover, :focus-visible, :active) { animation-play-state: paused; }
 @keyframes float-upload {
-  0%, 100% { transform: translate(0, 0); }
-  28% { transform: translate(-12px, -34dvh); }
-  55% { transform: translate(0, -61dvh); }
-  78% { transform: translate(-24px, -26dvh); }
+  0%, 100% {
+    left: calc(100% - var(--float-right));
+    top: calc(100% - var(--float-bottom));
+    transform: translate(-100%, -100%);
+  }
+  17% {
+    left: 47%;
+    top: 69%;
+    transform: translate(-47%, -69%);
+  }
+  31% {
+    left: var(--float-left);
+    top: 48%;
+    transform: translateY(-48%);
+  }
+  46% {
+    left: 34%;
+    top: var(--float-top);
+    transform: translateX(-34%);
+  }
+  61% {
+    left: calc(100% - var(--float-right));
+    top: 23%;
+    transform: translate(-100%, -23%);
+  }
+  76% {
+    left: 57%;
+    top: 49%;
+    transform: translate(-57%, -49%);
+  }
+  90% {
+    left: 28%;
+    top: calc(100% - var(--float-bottom));
+    transform: translate(-28%, -100%);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .upload-cta { animation: none; }
