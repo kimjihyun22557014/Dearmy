@@ -31,11 +31,11 @@ p, h1, h2, figure { margin: 0; }
 }
 .wordmark {
   margin-bottom: 15px;
-  font: 700 clamp(2rem, 8.1vw, 7.5rem)/.98 Nunito, Arial, sans-serif;
+  font: 700 clamp(2rem, 8.1vw, 7.5rem)/.98 "Gothic A1", Arial, sans-serif;
   letter-spacing: -.035em;
   white-space: nowrap;
 }
-.wordmark-question { color: var(--button-green); }
+.wordmark-question { color: #0b7232; }
 .intro p { font-size: clamp(1rem, 1.5vw, 1.125rem); font-weight: 400; line-height: 1.45; }
 .upload-cta {
   position: fixed;
@@ -130,7 +130,7 @@ p, h1, h2, figure { margin: 0; }
   }
 }
 .word-entry h3 { font-size: .8rem; margin: 0 0 12px; color: var(--ink); }
-.word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.09em; line-height: 1.34; white-space: normal; overflow-wrap: anywhere; }
+.word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.025em; line-height: 1.34; white-space: normal; overflow-wrap: anywhere; }
 .inline-object { display: inline-block; background: transparent; border: 0; width: 1.55em; height: 1.25em; padding: 0 .07em; vertical-align: -.32em; }
 .inline-object img { width: 100%; height: 100%; object-fit: contain; }
 dialog { width: min(680px, calc(100% - 24px)); max-height: calc(100dvh - 30px); background: var(--white); border: 1px solid var(--line); color: var(--ink); padding: 0; }
