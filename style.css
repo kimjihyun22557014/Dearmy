@@ -26,13 +26,13 @@ p, h1, h2, figure { margin: 0; }
   padding-inline: clamp(20px, 7vw, 100px);
 }
 .intro {
-  padding: clamp(64px, 12vw, 160px) 0 clamp(56px, 11vw, 144px);
+  padding: clamp(52px, 9vw, 128px) 0 clamp(56px, 11vw, 144px);
   text-align: center;
 }
 .wordmark {
   margin-bottom: 15px;
-  font: 400 clamp(3rem, 12vw, 11rem)/.98 Arial, sans-serif;
-  letter-spacing: -.085em;
+  font: 400 clamp(2rem, 8.1vw, 7.5rem)/.98 Arial, sans-serif;
+  letter-spacing: -.035em;
   white-space: nowrap;
 }
 .wordmark-question { color: var(--button-green); }
@@ -163,7 +163,6 @@ textarea { display: block; resize: vertical; line-height: 1.45; }
 .form-end button { flex-shrink: 0; text-decoration: underline; text-underline-offset: .25em; }
 #form-error { color: #9c1d1d; font-size: .83rem; margin-top: 7px; }
 @media (max-width: 580px) {
-  .wordmark { font-size: clamp(2.4rem, 11vw, 3.8rem); }
   .intro p { font-size: .9rem; }
   .story-body { grid-template-columns: 1fr; }
   .story-body img { height: 150px; }
