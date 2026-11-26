@@ -243,27 +243,11 @@ form.addEventListener('submit', async event => {
 render();
 
 const welcome = get('welcome');
-const welcomeKey = 'dear-my-welcome-seen';
-let showWelcome = true;
-try {
-  showWelcome = !localStorage.getItem(welcomeKey);
-} catch {
-  // A blocked storage setting still allows visitors to dismiss the dialog.
-}
-if (showWelcome) {
-  welcome.addEventListener('close', () => {
-    try {
-      localStorage.setItem(welcomeKey, '1');
-    } catch {
-      // The archive remains usable without storage.
-    }
-    scene.focus({ preventScroll: true });
-  }, { once: true });
-  welcome.addEventListener('keydown', event => {
-    if (event.key === 'Escape') welcome.close();
-  });
-  welcome.show();
-}
+welcome.addEventListener('close', () => scene.focus({ preventScroll: true }));
+welcome.addEventListener('keydown', event => {
+  if (event.key === 'Escape') welcome.close();
+});
+welcome.show();
 
 try {
   records = await loadEntries();
