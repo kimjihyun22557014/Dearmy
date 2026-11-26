@@ -42,7 +42,7 @@ function colorForObject(id) {
   return heartColors[(hash >>> 0) % heartColors.length];
 }
 
-export function floatHeart(marker, color, { delay = 0, distance = 1 } = {}) {
+export function floatHeart(marker, color, { delay = 0, distance = 1, duration = 650 } = {}) {
   const box = marker.getBoundingClientRect();
   const heart = element('span', 'object-heart', '♥\uFE0E');
   heart.setAttribute('aria-hidden', 'true');
@@ -61,7 +61,7 @@ export function floatHeart(marker, color, { delay = 0, distance = 1 } = {}) {
       { offset: .65, opacity: .9 },
       { transform: `translate(calc(-50% + ${drift}px), calc(-50% - ${lift}px)) scale(.85)`, opacity: 0 },
     ],
-    { duration: reducedMotion ? 220 : 650, delay, easing: 'ease-out', fill: 'backwards' },
+    { duration: reducedMotion ? 220 : duration, delay, easing: 'ease-out', fill: 'backwards' },
   );
   animation.finished.then(() => heart.remove(), () => heart.remove());
   return heart;

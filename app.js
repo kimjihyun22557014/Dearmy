@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
 import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
-import { element, floatHeart, wordsScene } from './scenes.js?v=heart-dismissal';
+import { element, floatHeart, wordsScene } from './scenes.js?v=slow-close-hearts';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
@@ -252,13 +252,13 @@ welcome.addEventListener('submit', event => {
 
   const closeButton = event.submitter || welcome.querySelector('.welcome-close');
   for (let index = 0; index < 7; index++) {
-    const heart = floatHeart(closeButton, '#0b7232', { delay: index * 20, distance: 2.3 });
+    const heart = floatHeart(closeButton, '#0b7232', { delay: index * 55, distance: 2.3, duration: 1150 });
     heart.classList.add('welcome-spark');
   }
 
   const animation = welcome.animate(
     [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.94)' }],
-    { duration: 190, easing: 'ease-in', fill: 'forwards' },
+    { duration: 300, easing: 'ease-out', fill: 'forwards' },
   );
   const closeWelcome = () => {
     if (welcome.open) welcome.close();
