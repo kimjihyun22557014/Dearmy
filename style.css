@@ -103,8 +103,8 @@ p, h1, h2, figure { margin: 0; }
 .interaction-hint {
   padding-top: clamp(16px, 3vw, 32px);
   color: var(--button-green);
-  font-size: .8125rem;
-  font-weight: 300;
+  font-size: .9375rem;
+  font-weight: 600;
   line-height: 1.55;
 }
 #notice { padding-top: 12px; color: var(--muted); font-size: .8rem; }
