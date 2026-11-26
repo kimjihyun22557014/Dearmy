@@ -151,7 +151,12 @@ p, h1, h2, figure { margin: 0; }
 dialog { width: min(680px, calc(100% - 24px)); max-height: calc(100dvh - 30px); background: var(--white); border: 1px solid var(--line); color: var(--ink); padding: 0; }
 dialog::backdrop { background: #0004; }
 .welcome-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
   width: min(540px, calc(100% - 24px));
+  height: fit-content;
+  margin: auto;
   max-height: calc(100dvh - 24px);
   border: 0;
   background: transparent;
@@ -162,7 +167,7 @@ dialog::backdrop { background: #0004; }
 .welcome-heart {
   position: relative;
   isolation: isolate;
-  padding: 23% 15% 25%;
+  padding: 23% 16% 28%;
 }
 .welcome-heart-shape {
   position: absolute;
@@ -187,17 +192,23 @@ dialog::backdrop { background: #0004; }
   overflow-wrap: anywhere;
 }
 .welcome-copy p + p { margin-top: .65em; }
-.welcome-heart button {
-  min-height: 44px;
-  margin-top: 9px;
-  padding: 4px 8px;
+.welcome-close {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  font-size: .8125rem;
-  text-decoration: underline;
-  text-underline-offset: .3em;
+  font-size: 1.5rem;
+  line-height: 1;
 }
-.welcome-heart button:focus-visible { outline-color: white; outline-offset: 1px; }
+.welcome-close:hover { background: #fff2; }
+.welcome-close:focus-visible { outline-color: white; outline-offset: 1px; }
 dialog .bar { position: sticky; top: 0; z-index: 2; min-height: 47px; padding: 5px 20px; border-bottom: 1px solid var(--line); background: var(--white); }
 dialog .bar button { min-width: 34px; }
 .story-body { display: grid; grid-template-columns: minmax(100px, .8fr) 1fr; gap: 23px; align-items: center; padding: 24px; }

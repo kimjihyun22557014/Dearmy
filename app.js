@@ -259,7 +259,10 @@ if (showWelcome) {
     }
     scene.focus({ preventScroll: true });
   }, { once: true });
-  welcome.showModal();
+  welcome.addEventListener('keydown', event => {
+    if (event.key === 'Escape') welcome.close();
+  });
+  welcome.show();
 }
 
 try {
