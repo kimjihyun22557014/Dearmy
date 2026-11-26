@@ -100,6 +100,13 @@ p, h1, h2, figure { margin: 0; }
 .pagination button { padding: 9px; border: 0; background: none; }
 .pagination button:enabled:hover { text-decoration: underline; }
 .pagination button:disabled { cursor: default; }
+.interaction-hint {
+  padding-top: clamp(16px, 3vw, 32px);
+  color: var(--button-green);
+  font-size: .8125rem;
+  font-weight: 300;
+  line-height: 1.55;
+}
 #notice { padding-top: 12px; color: var(--muted); font-size: .8rem; }
 #notice:empty { padding: 0; }
 #scene:focus { outline: none; }
