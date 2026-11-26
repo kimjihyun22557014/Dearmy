@@ -133,6 +133,14 @@ p, h1, h2, figure { margin: 0; }
 .word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.025em; line-height: 1.34; white-space: normal; overflow-wrap: anywhere; }
 .inline-object { display: inline-block; background: transparent; border: 0; width: 1.55em; height: 1.25em; padding: 0 .07em; vertical-align: -.32em; }
 .inline-object img { width: 100%; height: 100%; object-fit: contain; }
+.inline-object { touch-action: manipulation; }
+.object-heart {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  font: 700 .95rem/1 Arial, sans-serif;
+  transform: translate(-50%, -50%);
+}
 dialog { width: min(680px, calc(100% - 24px)); max-height: calc(100dvh - 30px); background: var(--white); border: 1px solid var(--line); color: var(--ink); padding: 0; }
 dialog::backdrop { background: #0004; }
 dialog .bar { position: sticky; top: 0; z-index: 2; min-height: 47px; padding: 5px 20px; border-bottom: 1px solid var(--line); background: var(--white); }
