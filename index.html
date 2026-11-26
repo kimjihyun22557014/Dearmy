@@ -8,8 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='11' fill='%232640ce'/%3E%3Ctext x='32' y='48' text-anchor='middle' fill='white' font-family='serif' font-size='49'%3E%3F%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@700&amp;display=swap&amp;text=Dear%20My%20%28%3F%29">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" crossorigin>
-  <link rel="stylesheet" href="./style.css?v=readable-top-hint">
-  <script type="module" src="./app.js?v=slow-close-hearts"></script>
+  <link rel="stylesheet" href="./style.css?v=story-actions">
+  <script type="module" src="./app.js?v=story-actions"></script>
 </head>
 <body>
   <main class="desk" aria-label="문장 속 물건">
@@ -43,13 +43,37 @@
       <button class="welcome-close" type="submit" aria-label="안내 닫기">×</button>
     </form>
   </dialog>
-  <dialog id="story" aria-labelledby="story-title">
-    <div class="bar"><span>물건의 이야기</span><button type="button" data-close aria-label="닫기">✕</button></div>
-    <div class="story-body">
+  <dialog id="story" aria-labelledby="story-dialog-title">
+    <div class="bar"><span id="story-dialog-title">물건의 이야기</span><button type="button" data-close aria-label="닫기">✕</button></div>
+    <div class="story-body" id="story-body">
       <img id="story-image" alt="">
       <div><p id="story-meta" class="meta"></p><h2 id="story-title"></h2><p id="story-text"></p></div>
     </div>
-    <footer id="story-actions" class="story-actions" hidden></footer>
+    <footer id="story-actions" class="story-actions" hidden>
+      <button id="edit-story" class="record-action" type="button" title="글 수정" aria-label="글 수정">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6 4 4M4 20l4.5-1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/></svg>
+      </button>
+      <button id="delete-story" class="record-action delete-record" type="button" title="글 삭제" aria-label="글 삭제">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5m4-5v5"/></svg>
+      </button>
+    </footer>
+    <form id="story-edit" class="story-edit" hidden>
+      <div class="fields">
+        <label>물건의 이름<input name="name" required maxlength="60"></label>
+        <label>함께한 시간<input name="duration" required maxlength="40"></label>
+      </div>
+      <label>물건의 이야기<textarea name="story" required maxlength="1000" rows="6"></textarea></label>
+      <div class="story-form-actions">
+        <button class="primary" id="cancel-edit" type="button">취소</button>
+        <button class="primary" type="submit">저장</button>
+      </div>
+    </form>
+    <form id="story-delete" class="story-form-actions story-delete" hidden>
+      <p>이 기록을 삭제할까요?</p>
+      <button class="primary" id="cancel-delete" type="button">취소</button>
+      <button class="primary" type="submit">삭제</button>
+    </form>
+    <p class="story-status" id="story-status" role="status"></p>
   </dialog>
   <dialog id="upload" aria-labelledby="upload-title">
     <div class="bar"><h2 id="upload-title">물건 올리기</h2><button type="button" data-close aria-label="닫기">✕</button></div>

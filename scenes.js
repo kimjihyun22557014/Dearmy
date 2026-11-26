@@ -67,7 +67,7 @@ export function floatHeart(marker, color, { delay = 0, distance = 1, duration = 
   return heart;
 }
 
-export function wordsScene(parent, entries, openStory, makeDeleteButton) {
+export function wordsScene(parent, entries, openStory) {
   const spread = element('div', 'words');
   let storyTimer, lastMarker, lastTap = -Infinity, inBurst = false;
   for (const entry of entries) {
@@ -105,8 +105,6 @@ export function wordsScene(parent, entries, openStory, makeDeleteButton) {
     const index = storyImageOffset(entry.story, entry.name);
     copy.append(entry.story.slice(0, index).trimEnd(), ' ', marker, ' ', entry.story.slice(index).trimStart());
     article.append(element('h3', '', entry.name + ' · ' + entry.duration + (entry.example ? ' · 예시' : '')), copy);
-    const deleteButton = makeDeleteButton?.(entry);
-    if (deleteButton) article.append(deleteButton);
     spread.append(article);
   }
   parent.append(spread);

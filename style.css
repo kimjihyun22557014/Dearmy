@@ -116,26 +116,21 @@ p, h1, h2, figure { margin: 0; }
 .meta { color: var(--muted); font-size: .74rem; }
 .word-entry { position: relative; padding: clamp(22px, 4vw, 48px) 0; border-bottom: 1px solid var(--line); }
 .word-entry:last-child { border-bottom: 0; }
-.word-entry:has(.delete-record) { padding-bottom: max(40px, 4vw); }
-.delete-record {
+.record-action {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  color: var(--muted);
+  color: var(--button-green);
 }
-.delete-record svg { width: 16px; height: 16px; }
+.record-action svg { width: 18px; height: 18px; }
+.record-action:hover { background: #17583f12; }
+.delete-record { color: var(--muted); }
 .delete-record:hover, .delete-record:focus-visible { color: #762439; }
-.word-entry > .delete-record { position: absolute; right: 0; bottom: 3px; }
-@media (hover: hover) and (pointer: fine) {
-  .word-entry:not(:hover):not(:focus-within) > .delete-record {
-    opacity: 0;
-    pointer-events: none;
-  }
-}
 .word-entry h3 { font-size: .8rem; margin: 0 0 12px; color: var(--ink); }
 .word-entry p { font-size: clamp(1.4rem, 4.4vw, 3.35rem); font-weight: 700; letter-spacing: -.025em; line-height: 1.34; white-space: normal; overflow-wrap: anywhere; }
 .inline-object { display: inline-block; background: transparent; border: 0; width: 1.55em; height: 1.25em; padding: 0 .07em; vertical-align: -.32em; }
@@ -214,6 +209,14 @@ dialog .bar { position: sticky; top: 0; z-index: 2; min-height: 47px; padding: 5
 dialog .bar button { min-width: 34px; }
 .story-body { display: grid; grid-template-columns: minmax(100px, .8fr) 1fr; gap: 23px; align-items: center; padding: 24px; }
 .story-actions { display: flex; justify-content: flex-end; padding: 0 18px 7px; }
+.story-edit { display: grid; gap: 12px; padding: 20px 24px; }
+.story-edit label { display: block; font-size: .9rem; font-weight: 600; }
+.story-form-actions { display: flex; justify-content: flex-end; align-items: baseline; gap: 16px; }
+.story-delete { padding: 0 24px 14px; }
+.story-delete p { margin-right: auto; font-size: .9rem; }
+.story-delete button[type="submit"] { color: #762439; }
+.story-status { padding: 0 24px 14px; font-size: .8rem; color: var(--muted); }
+.story-status:empty { display: none; }
 .story-body:has(+ .story-actions:not([hidden])) { padding-bottom: 3px; }
 .story-body img { width: 100%; max-height: 270px; object-fit: contain; }
 .story-body h2 { font-size: clamp(1.45rem, 4vw, 2.35rem); letter-spacing: -.06em; margin: 6px 0 13px; overflow-wrap: anywhere; }

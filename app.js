@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
-import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
-import { element, floatHeart, wordsScene } from './scenes.js?v=slow-close-hearts';
+import { loadEntries, saveEntry, canManageEntry, manageEntry, shared, invalidConfig } from './store.js?v=story-actions';
+import { element, floatHeart, wordsScene } from './scenes.js?v=story-actions';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
@@ -22,6 +22,14 @@ const nextPage = get('next-page');
 const pageNumber = get('page-number');
 const storyDialog = get('story');
 const storyActions = get('story-actions');
+const storyBody = get('story-body');
+const storyEdit = get('story-edit');
+const storyDelete = get('story-delete');
+const storyStatus = get('story-status');
+const editStoryButton = get('edit-story');
+const deleteStoryButton = get('delete-story');
+let activeStory;
+let managingStory = false;
 const uploadDialog = get('upload');
 const form = get('upload-form');
 const photo = get('photo');
@@ -38,41 +46,102 @@ let page = 1;
 let selectedImage, preparedPhoto, originalUrl, cutoutUrl, requestVersion = 0, entryId;
 let saving = false, preparingPhoto = false;
 
-function makeDeleteButton(entry) {
-  if (shared || entry.example || !records.some(record => record.id === entry.id)) return null;
-  const control = element('button', 'delete-record');
-  control.type = 'button';
-  control.setAttribute('aria-label', entry.name + ' 기록 삭제');
-  control.title = '기록 삭제';
-  control.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5m4-5v5"/></svg>';
-  control.addEventListener('click', () => {
-    if (!window.confirm('‘' + entry.name + '’ 기록을 삭제할까요?')) return;
-    try {
-      records = deleteLocalEntry(entry.id);
-    } catch {
-      window.alert('기록을 삭제하지 못했어요. 다시 시도해주세요.');
-      return;
-    }
-    if (storyDialog.open) storyDialog.close();
-    render();
-    scene.focus({ preventScroll: true });
-    notice.textContent = '기록을 삭제했어요.';
-  });
-  return control;
+function showStoryView() {
+  storyEdit.hidden = true;
+  storyDelete.hidden = true;
+  storyBody.hidden = false;
+  storyActions.hidden = !canManageEntry(activeStory);
+  storyStatus.textContent = '';
 }
 
 function openStory(entry) {
+  activeStory = entry;
   get('story-image').src = entry.image;
   get('story-image').alt = entry.name;
   get('story-title').textContent = entry.name;
   get('story-meta').textContent = entry.duration + ' 함께한 물건' + (entry.example ? ' · 예시 기록' : '');
   get('story-text').textContent = entry.story;
-  const deleteButton = makeDeleteButton(entry);
-  storyActions.replaceChildren();
-  if (deleteButton) storyActions.append(deleteButton);
-  storyActions.hidden = !deleteButton;
-  storyDialog.showModal();
+  showStoryView();
+  if (!storyDialog.open) storyDialog.showModal();
 }
+
+editStoryButton.addEventListener('click', () => {
+  const fields = storyEdit.elements;
+  fields.namedItem('name').value = activeStory.name;
+  fields.namedItem('duration').value = activeStory.duration;
+  fields.namedItem('story').value = activeStory.story;
+  storyBody.hidden = storyActions.hidden = true;
+  storyEdit.hidden = false;
+  fields.namedItem('name').focus();
+});
+deleteStoryButton.addEventListener('click', () => {
+  storyActions.hidden = true;
+  storyDelete.hidden = false;
+  get('cancel-delete').focus();
+});
+get('cancel-edit').addEventListener('click', () => {
+  showStoryView();
+  editStoryButton.focus();
+});
+get('cancel-delete').addEventListener('click', () => {
+  showStoryView();
+  deleteStoryButton.focus();
+});
+storyDialog.addEventListener('cancel', event => {
+  if (managingStory) {
+    event.preventDefault();
+  } else if (!storyEdit.hidden || !storyDelete.hidden) {
+    event.preventDefault();
+    const button = storyEdit.hidden ? deleteStoryButton : editStoryButton;
+    showStoryView();
+    button.focus();
+  }
+});
+
+async function submitStoryChange(event, removeEntry) {
+  event.preventDefault();
+  if (managingStory) return;
+  const entry = { ...activeStory };
+  const controls = event.currentTarget.querySelectorAll('input, textarea, button');
+  if (!removeEntry) {
+    const fields = new FormData(storyEdit);
+    entry.name = fields.get('name').trim();
+    entry.duration = fields.get('duration').trim();
+    entry.story = fields.get('story').trim();
+    if (!entry.name || !entry.duration || !entry.story) {
+      storyStatus.textContent = '이름, 함께한 시간, 이야기를 모두 적어주세요.';
+      return;
+    }
+  }
+  managingStory = true;
+  storyStatus.textContent = '';
+  for (const control of controls) control.disabled = true;
+  try {
+    await manageEntry(entry, removeEntry);
+    records = removeEntry
+      ? records.filter(record => record.id !== entry.id)
+      : records.map(record => record.id === entry.id ? entry : record);
+    render();
+    if (removeEntry) {
+      storyDialog.close();
+      notice.textContent = '기록을 삭제했어요.';
+      scene.focus({ preventScroll: true });
+    } else {
+      openStory(entry);
+      storyStatus.textContent = '수정했어요.';
+      editStoryButton.focus();
+    }
+  } catch {
+    storyStatus.textContent = removeEntry
+      ? '기록을 삭제하지 못했어요. 다시 시도해주세요.'
+      : '기록을 수정하지 못했어요. 다시 시도해주세요.';
+  } finally {
+    managingStory = false;
+    for (const control of controls) control.disabled = false;
+  }
+}
+storyEdit.addEventListener('submit', event => submitStoryChange(event, false));
+storyDelete.addEventListener('submit', event => submitStoryChange(event, true));
 
 function render() {
   const entries = config.showExamples ? [...records, ...examples] : records;
@@ -82,7 +151,7 @@ function render() {
 
   scene.replaceChildren();
   if (entries.length) {
-    wordsScene(scene, entries.slice(start, start + ENTRIES_PER_PAGE), openStory, makeDeleteButton);
+    wordsScene(scene, entries.slice(start, start + ENTRIES_PER_PAGE), openStory);
   } else {
     scene.append(element('p', 'empty', '아직 등록된 물건이 없어요. 첫 물건을 올려보세요.'));
   }
@@ -191,7 +260,9 @@ get('add').addEventListener('click', () => {
 });
 for (const node of document.querySelectorAll('[data-close]')) {
   node.addEventListener('click', () => {
-    if (!saving || node.closest('dialog') !== uploadDialog) node.closest('dialog').close();
+    const dialog = node.closest('dialog');
+    if ((dialog === uploadDialog && saving) || (dialog === storyDialog && managingStory)) return;
+    dialog.close();
   });
 }
 uploadDialog.addEventListener('cancel', event => { if (saving) event.preventDefault(); });
