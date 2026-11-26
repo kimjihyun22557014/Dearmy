@@ -33,13 +33,22 @@ export function storyImageOffset(text, name) {
 const heartColors = ['#db243b', '#e97019', '#d99a00', '#16864a', '#2875dd', '#36379a', '#873fb1'];
 const repeatTapWindow = 330;
 
-function floatHeart(marker) {
+function colorForObject(id) {
+  // Fold the stored ID into the palette so the color survives reloads.
+  let hash = 2166136261;
+  for (const character of String(id)) {
+    hash = Math.imul(hash ^ character.codePointAt(0), 16777619);
+  }
+  return heartColors[(hash >>> 0) % heartColors.length];
+}
+
+function floatHeart(marker, color) {
   const box = marker.getBoundingClientRect();
   const heart = element('span', 'object-heart', '♥\uFE0E');
   heart.setAttribute('aria-hidden', 'true');
   heart.style.left = `${box.left + box.width / 2}px`;
   heart.style.top = `${box.top + box.height / 2}px`;
-  heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+  heart.style.color = color;
   document.body.append(heart);
 
   const drift = Math.random() * 32 - 16;
@@ -61,6 +70,7 @@ export function wordsScene(parent, entries, openStory, makeDeleteButton) {
   const spread = element('div', 'words');
   let storyTimer, lastMarker, lastTap = -Infinity, inBurst = false;
   for (const entry of entries) {
+    const heartColor = colorForObject(entry.id);
     const article = element('article', 'word-entry');
     const copy = element('p');
     const marker = button('inline-object', entry.name + ' 이야기 열기');
@@ -77,8 +87,8 @@ export function wordsScene(parent, entries, openStory, makeDeleteButton) {
 
       const now = performance.now();
       if (lastMarker === marker && now - lastTap <= repeatTapWindow) {
-        if (!inBurst) floatHeart(marker);
-        floatHeart(marker);
+        if (!inBurst) floatHeart(marker, heartColor);
+        floatHeart(marker, heartColor);
         inBurst = true;
       } else {
         inBurst = false;

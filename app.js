@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
 import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
-import { element, wordsScene } from './scenes.js?v=rainbow-hearts';
+import { element, wordsScene } from './scenes.js?v=object-heart-colors';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
