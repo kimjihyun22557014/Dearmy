@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { makeCutout, prepareImageFile, toDataUrl } from './photo.js?v=heic-upload';
 import { loadEntries, saveEntry, deleteLocalEntry, shared, invalidConfig } from './store.js?v=delete-record';
-import { element, wordsScene } from './scenes.js?v=object-heart-colors';
+import { element, floatHeart, wordsScene } from './scenes.js?v=heart-dismissal';
 
 const examples = [
   ['camera', '필름 카메라', '3년', '주말에 집을 나설 때 필름 카메라를 챙겨요. 같은 길도 한 장 남길 만한 장면이 있는지 천천히 보게 됐어요.'],
@@ -243,7 +243,33 @@ form.addEventListener('submit', async event => {
 render();
 
 const welcome = get('welcome');
-welcome.addEventListener('close', () => scene.focus({ preventScroll: true }));
+let closingWelcome = false;
+welcome.addEventListener('submit', event => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  event.preventDefault();
+  if (closingWelcome) return;
+  closingWelcome = true;
+
+  const closeButton = event.submitter || welcome.querySelector('.welcome-close');
+  for (let index = 0; index < 7; index++) {
+    const heart = floatHeart(closeButton, '#0b7232', { delay: index * 20, distance: 2.3 });
+    heart.classList.add('welcome-spark');
+  }
+
+  const animation = welcome.animate(
+    [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.94)' }],
+    { duration: 190, easing: 'ease-in', fill: 'forwards' },
+  );
+  const closeWelcome = () => {
+    if (welcome.open) welcome.close();
+    animation.cancel();
+  };
+  animation.finished.then(closeWelcome, closeWelcome);
+});
+welcome.addEventListener('close', () => {
+  closingWelcome = false;
+  scene.focus({ preventScroll: true });
+});
 welcome.addEventListener('keydown', event => {
   if (event.key === 'Escape') welcome.close();
 });

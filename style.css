@@ -208,6 +208,7 @@ dialog::backdrop { background: #0004; }
   line-height: 1;
 }
 .welcome-close:hover { background: #fff2; }
+.welcome-spark { z-index: 21; }
 .welcome-close:focus-visible { outline-color: white; outline-offset: 1px; }
 dialog .bar { position: sticky; top: 0; z-index: 2; min-height: 47px; padding: 5px 20px; border-bottom: 1px solid var(--line); background: var(--white); }
 dialog .bar button { min-width: 34px; }

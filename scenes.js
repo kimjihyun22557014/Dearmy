@@ -42,7 +42,7 @@ function colorForObject(id) {
   return heartColors[(hash >>> 0) % heartColors.length];
 }
 
-function floatHeart(marker, color) {
+export function floatHeart(marker, color, { delay = 0, distance = 1 } = {}) {
   const box = marker.getBoundingClientRect();
   const heart = element('span', 'object-heart', '♥\uFE0E');
   heart.setAttribute('aria-hidden', 'true');
@@ -51,8 +51,8 @@ function floatHeart(marker, color) {
   heart.style.color = color;
   document.body.append(heart);
 
-  const drift = Math.random() * 32 - 16;
-  const lift = 26 + Math.random() * 17;
+  const drift = (Math.random() * 32 - 16) * distance;
+  const lift = (26 + Math.random() * 17) * distance;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const animation = heart.animate(
     reducedMotion ? [{ opacity: 1 }, { opacity: 0 }] : [
@@ -61,9 +61,10 @@ function floatHeart(marker, color) {
       { offset: .65, opacity: .9 },
       { transform: `translate(calc(-50% + ${drift}px), calc(-50% - ${lift}px)) scale(.85)`, opacity: 0 },
     ],
-    { duration: reducedMotion ? 220 : 650, easing: 'ease-out' },
+    { duration: reducedMotion ? 220 : 650, delay, easing: 'ease-out', fill: 'backwards' },
   );
   animation.finished.then(() => heart.remove(), () => heart.remove());
+  return heart;
 }
 
 export function wordsScene(parent, entries, openStory, makeDeleteButton) {
