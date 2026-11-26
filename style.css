@@ -31,7 +31,7 @@ p, h1, h2, figure { margin: 0; }
 }
 .wordmark {
   margin-bottom: 15px;
-  font: 700 clamp(2rem, 8.1vw, 7.5rem)/.98 "Gothic A1", Arial, sans-serif;
+  font: 700 clamp(2rem, 8.1vw, 7.5rem)/.98 Futura, "Futura PT", Jost, Arial, sans-serif;
   letter-spacing: -.035em;
   white-space: nowrap;
 }
