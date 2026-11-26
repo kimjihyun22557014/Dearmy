@@ -313,6 +313,72 @@ form.addEventListener('submit', async event => {
 
 render();
 
+const scrollRefreshParam = 'scroll-refresh';
+const currentUrl = new URL(window.location.href);
+const fromScrollRefresh = currentUrl.searchParams.has(scrollRefreshParam);
+if (fromScrollRefresh) {
+  currentUrl.searchParams.delete(scrollRefreshParam);
+  window.history.replaceState(window.history.state, '', currentUrl);
+}
+
+let refreshing = false;
+function refreshFromTop() {
+  if (refreshing) return;
+  refreshing = true;
+  const url = new URL(window.location.href);
+  url.searchParams.set(scrollRefreshParam, '1');
+  window.history.replaceState(window.history.state, '', url);
+  window.location.reload();
+}
+
+let touchStart;
+let pullDistance = 0;
+window.addEventListener('touchstart', event => {
+  pullDistance = 0;
+  touchStart = window.scrollY <= 0 && event.touches.length === 1 && !event.target.closest?.('dialog')
+    ? event.touches[0]
+    : undefined;
+}, { passive: true });
+window.addEventListener('touchmove', event => {
+  if (!touchStart) return;
+  if (event.touches.length !== 1 || window.scrollY > 0) {
+    touchStart = undefined;
+    return;
+  }
+  const touch = event.touches[0];
+  const distance = touch.clientY - touchStart.clientY;
+  if (distance <= Math.abs(touch.clientX - touchStart.clientX)) {
+    touchStart = undefined;
+    return;
+  }
+  pullDistance = distance;
+  if (event.cancelable) event.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', () => {
+  if (touchStart && pullDistance >= 85) refreshFromTop();
+  touchStart = undefined;
+}, { passive: true });
+window.addEventListener('touchcancel', () => { touchStart = undefined; }, { passive: true });
+
+let lastWheel = -Infinity;
+let wheelPull = 0;
+let wheelStartedAtTop = false;
+window.addEventListener('wheel', event => {
+  if (event.timeStamp - lastWheel > 180) {
+    wheelPull = 0;
+    wheelStartedAtTop = window.scrollY <= 0;
+  }
+  lastWheel = event.timeStamp;
+  if (window.scrollY > 0 || event.deltaY >= 0 || event.ctrlKey || event.target.closest?.('dialog')) {
+    wheelStartedAtTop = false;
+    return;
+  }
+  if (!wheelStartedAtTop || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+  const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+  wheelPull += Math.min(-event.deltaY * unit, 70);
+  if (wheelPull >= 120) refreshFromTop();
+}, { passive: true });
+
 const welcome = get('welcome');
 let closingWelcome = false;
 welcome.addEventListener('submit', event => {
@@ -344,7 +410,7 @@ welcome.addEventListener('close', () => {
 welcome.addEventListener('keydown', event => {
   if (event.key === 'Escape') welcome.close();
 });
-welcome.show();
+if (!fromScrollRefresh) welcome.show();
 
 try {
   records = await loadEntries();

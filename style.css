@@ -1,4 +1,5 @@
 :root {
+  overscroll-behavior-y: none;
   --button-green: #17583f;
   color-scheme: light;
   --white: #fff;
